@@ -1,111 +1,128 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anjali Electronics & Home Appliances</title>
-  <style>
-    body {
-      background-color: #0a0a0a;
-      color: #f4d03f;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #111;
-      padding: 15px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: #f4d03f;
-    }
-    footer {
-      background-color: #111;
-      padding: 15px;
-      text-align: center;
-      font-size: 14px;
-      color: #f4d03f;
-    }
-    .whatsapp-float {
-      position: fixed;
-      width: 60px;
-      height: 60px;
-      bottom: 40px;
-      right: 40px;
-      background-color: #25d366;
-      color: white;
-      border-radius: 50px;
-      text-align: center;
-      font-size: 30px;
-      box-shadow: 2px 2px 3px #999;
-      z-index: 100;
-    }
-    .whatsapp-float i {
-      margin-top: 16px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anjali Electronics & Home Appliances</title>
+<meta name="description" content="Anjali Electronics catalogue — TVs, Refrigerators, Washing Machines and more. Enquire via WhatsApp."/>
+<style>
+:root{--bg:#070707;--card:#0f0f10;--muted:#bfb7a1;--gold:#c59d1a;--white:#ffffff}
+*{box-sizing:border-box;font-family:Inter,system-ui,Arial,Helvetica,sans-serif}
+body{margin:0;background:linear-gradient(180deg,#050506,#0b0b0c);color:var(--white);-webkit-font-smoothing:antialiased}
+header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.02)}
+.logo{height:56px;width:56px;border-radius:8px;background:#fff;object-fit:cover}
+.brand h1{margin:0;font-size:18px;color:var(--white)}
+.container{max-width:1100px;margin:20px auto;padding:0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;overflow:hidden;border:1px solid rgba(197,157,26,0.06)}
+.card img{width:100%;height:160px;object-fit:cover;display:block;filter:brightness(0.62)}
+.card .meta{padding:12px}
+.card h3{margin:0 0 6px;color:var(--gold);font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:13px}
+.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--gold);color:#0a0a0a;text-decoration:none;font-weight:700;margin-top:8px}
+.banner{height:280px;overflow:hidden;border-radius:10px;position:relative;margin-bottom:12px}
+.banner img{width:100%;height:100%;object-fit:cover;filter:brightness(0.5)}
+.banner h2{position:absolute;left:20px;bottom:18px;color:var(--white);font-size:26px;margin:0}
+.subcats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.subcats button{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:default}
+.footer{margin-top:18px;padding:18px;background:transparent;border-top:1px solid rgba(255,255,255,0.02);color:var(--muted);text-align:center}
+.whatsapp-float{position:fixed;right:20px;bottom:24px;width:64px;height:64px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;z-index:2000;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+.hidden{display:none;}
+@media(max-width:600px){.banner{height:180px}.card img{height:120px}}
+</style>
 </head>
 <body>
-  <header>Anjali Electronics & Home Appliances</header>
+<header>
+  <img src="assets/logo.png" class="logo" alt="logo" onerror="this.style.display='none'"/>
+  <div class="brand"><h1>Anjali Electronics & Home Appliances</h1><div style="color:var(--muted);font-size:13px">Nadiganj, Nawada · Call: 8789574892</div></div>
+  <div style="margin-left:auto"><a href="#/admin" style="color:var(--gold);text-decoration:none;font-weight:700">Admin</a></div>
+</header>
 
-  <div id="app">
-    <!-- Customer Catalogue -->
-    <div id="customer-page">
-      <h2 style="text-align:center;">Welcome to Anjali Electronics</h2>
-      <p style="text-align:center;">Explore our range of home appliances and electronics.</p>
-    </div>
+<main class="container" id="app">
+  <!-- content injected by JS -->
+</main>
 
-    <!-- Admin Login (hidden by default) -->
-    <div id="admin-page" style="display:none;">
-      <h2>Admin Panel</h2>
-      <p>Login required to manage catalogue.</p>
-    </div>
-  </div>
+<!-- WhatsApp button – shown only on customer pages -->
+<a id="whatsapp-btn" class="whatsapp-float" target="_blank" href="https://wa.me/918789574892?text=Hello%20Anjali%20Electronics!%20I%20am%20interested%20in%20your%20products.">💬</a>
 
-  <!-- WhatsApp Button (only on customer pages) -->
-  <a href="https://wa.me/918789574892?text=Hello%20Anjali%20Electronics!%20I’d%20like%20to%20know%20more%20about%20your%20products." 
-     class="whatsapp-float" target="_blank" id="whatsapp-btn">
-     💬
-  </a>
+<footer class="footer">
+  📞 8789574892 | 📧 <a href="mailto:anjali.electronic.nardiganj@gmail.com" style="color:var(--gold);text-decoration:none">anjali.electronic.nardiganj@gmail.com</a> · 📍 Nardiganj, Nawada (Bihar) · 
+  <a href="https://www.facebook.com/share/19tKZb5aU6/" target="_blank" style="color:var(--gold)">Facebook</a> | 
+  <a href="https://www.instagram.com/anjali.electronics" target="_blank" style="color:var(--gold)">Instagram</a> | 
+  <a href="https://maps.app.goo.gl/nTp9nwozZe6qtEDv6" target="_blank" style="color:var(--gold)">Google Maps</a>
+</footer>
 
-  <footer>
-    📞 8789574892 | 📧 anjali.electronic.nardiganj@gmail.com<br>
-    📍 Nardiganj, Nawada (Bihar)<br>
-    <a href="https://www.facebook.com/share/19tKZb5aU6/" target="_blank">Facebook</a> |
-    <a href="https://www.instagram.com/anjali.electronics" target="_blank">Instagram</a> |
-    <a href="https://maps.app.goo.gl/nTp9nwozZe6qtEDv6" target="_blank">Google Maps</a>
-  </footer>
+<script>
+// Category data (id, title, image query, description)
+const CATS = [
+  {id:'tv', title:'Televisions', img:'https://source.unsplash.com/featured/?television,tv', desc:'Smart, LED, Android & 4K TVs.'},
+  {id:'refrigerator', title:'Refrigerators', img:'https://source.unsplash.com/featured/?refrigerator,fridge', desc:'Single door, double door, inverter.'},
+  {id:'washing', title:'Washing Machines', img:'https://source.unsplash.com/featured/?washing-machine,laundry', desc:'Top load, front load, semi-auto.'},
+  {id:'mixer', title:'Mixer Grinders', img:'https://source.unsplash.com/featured/?mixer,grinder,kitchen', desc:'2-jar, 3-jar, juicer mixers.'},
+  {id:'cooker', title:'Pressure Cookers', img:'https://source.unsplash.com/featured/?pressure-cooker,kitchen', desc:'Aluminium & stainless steel.'},
+  {id:'lights', title:'Lights Range', img:'https://source.unsplash.com/featured/?lighting,led,bulb', desc:'LED bulbs, tube lights & lamps.'},
+  {id:'headphones', title:'Headphones', img:'https://source.unsplash.com/featured/?headphones,audio', desc:'Wired, Bluetooth, TWS.'},
+  {id:'cables', title:'Industrial Cables', img:'https://source.unsplash.com/featured/?cable,electric', desc:'Wires, power cables, multicore.'},
+  {id:'utensils', title:'Home Utensils', img:'https://source.unsplash.com/featured/?kitchen-utensils,utensils', desc:'Cookware, sets & accessories.'},
+  {id:'gas', title:'Gas Stoves', img:'https://source.unsplash.com/featured/?gas-stove,kitchen', desc:'2/3/4 burner stoves.'},
+  {id:'induction', title:'Inductions & Infrared', img:'https://source.unsplash.com/featured/?induction-cooktop,induction', desc:'Induction & infrared cooktops.'},
+  {id:'heaters', title:'Heaters & Geysers', img:'https://source.unsplash.com/featured/?heater,geyser', desc:'Room heaters, geysers, immersion rods.'}
+];
 
- <script>
-  // Route Handling
-  function loadRoute() {
-    const hash = window.location.hash;
-    const adminPage = document.getElementById('admin-page');
-    const customerPage = document.getElementById('customer-page');
-    const whatsappBtn = document.getElementById('whatsapp-btn');
-
-    if (hash === "#/admin") {
-      adminPage.style.display = "block";
-      customerPage.style.display = "none";
-      whatsappBtn.style.display = "none";
-    } else {
-      adminPage.style.display = "none";
-      customerPage.style.display = "block";
-      whatsappBtn.style.display = "block";
-    }
-  }
-
-  // Always redirect to customer page by default
-  window.addEventListener('load', () => {
-    if (!window.location.hash || window.location.hash === "#") {
-      window.location.hash = "#/";
-    }
-    loadRoute();
+function renderHome(){
+  const app = document.getElementById('app');
+  app.innerHTML = '<h2 style="color:var(--gold);margin-top:6px">Categories</h2><div class="grid" id="catGrid"></div>';
+  const grid = document.getElementById('catGrid');
+  CATS.forEach(c=>{
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML = `<img src="${c.img}" alt="${c.title}"><div class="meta"><h3>${c.title}</h3><p>${c.desc}</p><a class="btn" href="#/category/${c.id}">Explore</a></div>`;
+    grid.appendChild(card);
   });
+}
 
-  window.addEventListener('hashchange', loadRoute);
+function renderCategory(catId){
+  const cat = CATS.find(c=>c.id===catId);
+  const app = document.getElementById('app');
+  if(!cat){ app.innerHTML = '<p>Category not found</p>'; return; }
+  app.innerHTML = `<div class="banner"><img src="${cat.img}" alt="${cat.title}"><h2>${cat.title}</h2></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div style="color:var(--muted)">${cat.desc}</div><a class="btn" id="enqBtn">Enquire Now</a></div>
+    <div style="margin-top:12px"><h3 style="color:var(--gold)">Subcategories</h3><div class="subcats" id="subcats"></div></div>
+    <div style="margin-top:14px"><h3 style="color:var(--gold)">Products</h3><div id="products" class="grid"></div></div>`;
+  // sample subcategories placeholders
+  const subcats = ['Model A','Model B','Model C'];
+  const sc = document.getElementById('subcats');
+  subcats.forEach(s=>{ const b=document.createElement('button'); b.textContent=s; sc.appendChild(b); });
+  // products sample: empty by default; admin will add products if you have admin that writes data.json
+  const products = []; // empty; admin can populate stored data
+  const pg = document.getElementById('products');
+  if(products.length===0){ pg.innerHTML = '<p style="color:var(--muted)">No products added yet. Use admin panel to add products.</p>'; }
+  else{
+    products.forEach(p=>{ const d=document.createElement('div'); d.className='card'; d.innerHTML=`<img src="${p.img}"><div class="meta"><h3>${p.name}</h3><a class="btn" href="https://wa.me/918789574892?text=Hello%20Anjali%20Electronics!%20I%20am%20interested%20in%20${encodeURIComponent(p.name)}">Enquire</a></div>`; pg.appendChild(d); });
+  }
+  document.getElementById('enqBtn').addEventListener('click', ()=>{
+    const txt = encodeURIComponent(`Hello Anjali Electronics! I'm interested in ${cat.title}.`);
+    window.open(`https://wa.me/918789574892?text=${txt}`, '_blank');
+  });
+}
+
+function renderAdmin(){
+  // If you have a more advanced admin system in your repo, keep it. This link is a placeholder.
+  const app = document.getElementById('app');
+  app.innerHTML = `<h2 style="color:var(--gold)">Admin Panel</h2><p class="small" style="color:var(--muted)">If you already have the admin interface (localStorage-based) in your project, it will continue to work at <code>#/admin-old</code>. This page is the v3 public site; keep your existing admin files or merge admin code into this build.</p><p><a class="btn" href="#/admin-old">Open legacy admin</a></p>`;
+}
+
+// router
+function router(){
+  const hash = location.hash || '#/';
+  if(hash === '#/admin'){ renderAdmin(); document.getElementById('whatsapp-btn').classList.add('hidden'); return; }
+  if(hash.startsWith('#/category/')){ const id = hash.split('/')[2]; renderCategory(id); document.getElementById('whatsapp-btn').classList.remove('hidden'); return; }
+  // default homepage
+  renderHome(); document.getElementById('whatsapp-btn').classList.remove('hidden');
+}
+
+// ensure default to customer homepage
+window.addEventListener('load', ()=>{ if(!location.hash || location.hash === '#') location.hash = '#/'; router(); });
+window.addEventListener('hashchange', router);
 </script>
-
 </body>
 </html>
