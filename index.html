@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anjali Electronics — Admin Panel</title>
+  <meta name="description" content="Anjali Electronics catalogue with admin panel (client-side JSON)." />
+  <style>
+    :root{--bg:#0b0b0c;--card:#0f0f10;--muted:#bfb7a1;--gold:#c59d1a;--white:#ffffff}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Arial,Helvetica,sans-serif}
+    body{margin:0;background:linear-gradient(180deg,#060607,#0b0b0c);color:var(--white)}
+    header{padding:16px 20px;display:flex;align-items:center;gap:12px}
+    .logo{height:56px;width:56px;border-radius:10px;background:#fff;object-fit:cover}
+    .brand h1{margin:0;font-size:18px}
+    .container{max-width:1100px;margin:18px auto;padding:0 18px}
+    .panel{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(197,157,26,0.08)}
+    label{display:block;margin-top:8px;color:var(--muted)}
+    input,select,textarea{width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--white)}
+    .row{display:flex;gap:10px}
+    .col{flex:1}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--gold);color:#0a0a0a;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--white)}
+    .list{margin-top:10px}
+    .item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+    .small{font-size:13px;color:var(--muted)}
+    .hint{font-size:13px;color:var(--muted);margin-top:6px}
+    .flex{display:flex;gap:8px;align-items:center}
+    a.link{color:var(--gold)}
+    footer{margin-top:18px;text-align:center;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.png" alt="logo" class="logo" onerror="this.style.display='none'"/>
+    <div class="brand"><h1>Anjali Electronics — Admin</h1><div class="small">Manage catalogue · client-side JSON</div></div>
+  </header>
+
+  <main class="container">
+    <div id="app"></div>
+    <footer>Tip: your changes are saved to your browser (localStorage). Use Export to download data.json for backup.</footer>
+  </main>
+
+  <script>
+    /***** CONFIG - admin credentials (username + sha256(password)) *****/
+    const ADMIN_USERNAME = 'gulshan';
+    const ADMIN_PASSWORD_HASH = 'c6dff946bb2138c98243bef667152c4e2ac583a7b9edcd748b8c6b280aa82dff'; // sha256('sudhir')
+
+    /***** Utilities *****/
+    async function sha256(text){
+      const msgUint8 = new TextEncoder().encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+
+    // local storage key
+    const STORAGE_KEY = 'anjali_catalogue_v1';
+
+    // default starter data (will be used if none exists)
+    const DEFAULT_DATA = {
+      site:{name:'Anjali Electronics & Home Appliances', phone:'8789574892', email:'anjali.electronic.nardiganj@gmail.com', address:'Nadiganj, Nawada, Bihar'},
+      categories:[
+        {id:1,title:'Televisions',banner:'https://source.unsplash.com/featured/?tv,television',subcategories:['Smart TVs','LED TVs','Android TVs','HD / Full HD / 4K Models'],products:[]},
+        {id:2,title:'Refrigerators',banner:'https://source.unsplash.com/featured/?refrigerator,fridge',subcategories:['Single Door','Double Door','Inverter Series','Deep Freezers'],products:[]},
+        {id:3,title:'Washing Machines',banner:'https://source.unsplash.com/featured/?washing-machine,laundry',subcategories:['Semi-Automatic','Fully Automatic','Top Load','Front Load'],products:[]},
+        {id:4,title:'Mixer Grinders',banner:'https://source.unsplash.com/featured/?mixer,grinder,kitchen',subcategories:['2 Jar Mixers','3 Jar Heavy-Duty Mixers','Juicer Mixer Grinders'],products:[]},
+        {id:5,title:'Pressure Cookers',banner:'https://source.unsplash.com/featured/?pressure-cooker,kitchen',subcategories:['Aluminium','Stainless Steel','Outer Lid','Inner Lid'],products:[]},
+        {id:6,title:'Lights Range',banner:'https://source.unsplash.com/featured/?lighting,led,bulb',subcategories:['LED Bulbs','Tube Lights','Ceiling Lights','Decorative Lamps'],products:[]},
+        {id:7,title:'Headphones',banner:'https://source.unsplash.com/featured/?headphones,audio',subcategories:['Wired','Bluetooth','Neckbands','TWS (True Wireless)'],products:[]},
+        {id:8,title:'Industrial Cables',banner:'https://source.unsplash.com/featured/?cable,electric',subcategories:['Electrical Wires','Power Cables','Multicore','Armoured Cables'],products:[]},
+        {id:9,title:'Home Utensils',banner:'https://source.unsplash.com/featured/?kitchen-utensils,utensils',subcategories:['Stainless Steel Sets','Non-stick Cookware','Kitchen Accessories'],products:[]},
+        {id:10,title:'Gas Stoves',banner:'https://source.unsplash.com/featured/?gas-stove,stove,kitchen',subcategories:['2 Burner','3 Burner','4 Burner'],products:[]},
+        {id:11,title:'Inductions & Infrared',banner:'https://source.unsplash.com/featured/?induction-cooktop,induction',subcategories:['Induction Cooktops','Infrared Cooktops'],products:[]},
+        {id:12,title:'Heaters, Geysers & Immersion Rods',banner:'https://source.unsplash.com/featured/?heater,geyser,immersion',subcategories:['Room Heaters','Water Geysers (Instant / Storage)','Immersion Rods'],products:[]}
+      ]
+    };
+
+    function loadData(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) { localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA)); return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+        return JSON.parse(raw);
+      }catch(e){console.error(e); localStorage.removeItem(STORAGE_KEY); localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA)); return JSON.parse(JSON.stringify(DEFAULT_DATA));}
+    }
+    function saveData(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+    /***** Simple Router: #/admin for admin panel, #/site preview to view public site *****/
+    function router(){
+      const root = document.getElementById('app');
+      const hash = location.hash || '#/admin';
+      if(hash.startsWith('#/admin')) renderAdmin(root);
+      else renderPreview(root);
+    }
+
+    /***** Admin UI *****/
+    async function renderAdmin(root){
+      root.innerHTML = '';
+      const data = loadData();
+
+      // Login check
+      if(!sessionStorage.getItem('anjali_admin')){
+        const panel = document.createElement('div'); panel.className='panel';
+        panel.innerHTML = `
+          <h2>Admin Login</h2>
+          <p class="hint">Enter your username & password to access the dashboard.</p>
+          <label>Username</label><input id="u" value="" />
+          <label>Password</label><input id="p" type="password" />
+          <div style="margin-top:12px"><button id="login" class="btn">Login</button> <button id="demo" class="ghost">Use demo data</button></div>
+          <p class="hint">Default: username provided. Password stored as secure hash.</p>
+        `;
+        root.appendChild(panel);
+        document.getElementById('login').onclick = async ()=>{
+          const u = document.getElementById('u').value.trim();
+          const p = document.getElementById('p').value || '';
+          const h = await sha256(p);
+          if(u===ADMIN_USERNAME && h===ADMIN_PASSWORD_HASH){ sessionStorage.setItem('anjali_admin','1'); renderAdmin(root); }
+          else alert('Invalid credentials');
+        }
+        document.getElementById('demo').onclick = ()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA)); alert('Demo data restored'); location.reload(); }
+        return;
+      }
+
+      // Dashboard
+      const panel = document.createElement('div'); panel.className='panel';
+      panel.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2>Dashboard</h2><div class="flex"><button id="logout" class="ghost">Logout</button><button id="export" class="btn">Export JSON</button><button id="importBtn" class="ghost">Import JSON</button></div></div>
+        <p class="hint">Manage categories, subcategories and products. Products support image URL. Each product will show an "Enquire Now" mailto button on public site.</p>
+        <hr style="opacity:0.06;margin:12px 0">
+      `;
+      root.appendChild(panel);
+
+      document.getElementById('logout').onclick = ()=>{ sessionStorage.removeItem('anjali_admin'); location.reload(); }
+      document.getElementById('export').onclick = ()=>{ const blob = new Blob([JSON.stringify(loadData(),null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='anjali_data.json'; a.click(); URL.revokeObjectURL(url); }
+      document.getElementById('importBtn').onclick = ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange=()=>{ const f=inp.files[0]; const r=new FileReader(); r.onload=()=>{ try{ const j=JSON.parse(r.result); saveData(j); alert('Imported'); location.reload(); }catch(e){alert('Invalid file')} }; r.readAsText(f); }; inp.click(); }
+
+      // Site Settings
+      const sitePanel = document.createElement('div'); sitePanel.className='panel';
+      sitePanel.innerHTML = `
+        <h3>Site Settings</h3>
+        <label>Shop Name</label><input id="site_name" value="${data.site.name}" />
+        <div class="row"><div class="col"><label>Phone</label><input id="site_phone" value="${data.site.phone}" /></div><div class="col"><label>Email</label><input id="site_email" value="${data.site.email}" /></div></div>
+        <label>Address</label><input id="site_address" value="${data.site.address}" />
+        <div style="margin-top:8px"><button id="saveSite" class="btn">Save Site Settings</button></div>
+      `;
+      root.appendChild(sitePanel);
+      document.getElementById('saveSite').onclick = ()=>{ data.site.name=document.getElementById('site_name').value; data.site.phone=document.getElementById('site_phone').value; data.site.email=document.getElementById('site_email').value; data.site.address=document.getElementById('site_address').value; saveData(data); alert('Saved'); }
+
+      // Categories Manager
+      const catPanel = document.createElement('div'); catPanel.className='panel';
+      catPanel.innerHTML = `<h3>Categories</h3><div style="display:flex;gap:8px"><input id="newCat" placeholder="New category title" /><input id="newBanner" placeholder="Banner image URL (optional)" /><button id="addCat" class="btn">Add Category</button></div><div id="catList" class="list"></div>`;
+      root.appendChild(catPanel);
+
+      document.getElementById('addCat').onclick = ()=>{
+        const t=document.getElementById('newCat').value.trim(); const b=document.getElementById('newBanner').value.trim();
+        if(!t) return alert('Enter title');
+        const id = Date.now(); data.categories.push({id,title:t,banner:b||'https://source.unsplash.com/featured/?'+encodeURIComponent(t),subcategories:[],products:[]}); saveData(data); renderCats(); document.getElementById('newCat').value=''; document.getElementById('newBanner').value='';
+      }
+
+      function renderCats(){
+        const list = document.getElementById('catList'); list.innerHTML=''; data.categories.forEach(c=>{
+          const div=document.createElement('div'); div.className='item';
+          div.innerHTML = `<div><strong>${c.title}</strong><div class="small">${c.subcategories.length} subcats · ${c.products.length} products</div></div><div class="flex"><button class="ghost" data-id="${c.id}" data-action="edit">Edit</button><button class="ghost" data-id="${c.id}" data-action="open">Open</button><button class="ghost" data-id="${c.id}" data-action="del">Delete</button></div>`;
+          list.appendChild(div);
+        });
+        list.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',e=>{
+          const id=Number(btn.dataset.id); const action=btn.dataset.action; if(action==='del'){ if(confirm('Delete category?')){ data.categories = data.categories.filter(x=>x.id!==id); saveData(data); renderCats(); } }
+          if(action==='edit'){ openEditCategory(id); }
+          if(action==='open'){ openCategoryEditor(id); }
+        }));
+      }
+      renderCats();
+
+      function openEditCategory(id){
+        const c = data.categories.find(x=>x.id===id); if(!c) return; const modal=document.createElement('div'); modal.className='panel'; modal.style.marginTop='12px'; modal.innerHTML = `<h3>Edit Category</h3><label>Title</label><input id="edit_title" value="${c.title}" /><label>Banner URL</label><input id="edit_banner" value="${c.banner||''}" /><div style="margin-top:8px"><button id="saveEdit" class="btn">Save</button> <button id="cancelEdit" class="ghost">Cancel</button></div>`; root.insertBefore(modal, catPanel.nextSibling);
+        document.getElementById('cancelEdit').onclick = ()=>{ modal.remove(); };
+        document.getElementById('saveEdit').onclick = ()=>{ c.title=document.getElementById('edit_title').value; c.banner=document.getElementById('edit_banner').value; saveData(data); alert('Saved'); modal.remove(); renderCats(); }
+      }
+
+      function openCategoryEditor(id){
+        const c = data.categories.find(x=>x.id===id); if(!c) return; // open full editor
+        const editor = document.createElement('div'); editor.className='panel';
+        editor.innerHTML = `<h3>Category: ${c.title}</h3>
+          <div style="display:flex;gap:8px"><div class="col"><label>New Subcategory</label><input id="newSub" placeholder="Subcategory title" /></div><div class="col"><label>New Product</label><input id="newProd" placeholder="Product name" /></div></div>
+          <label>Product Image URL</label><input id="newProdImg" placeholder="https://..." />
+          <div style="margin-top:8px"><button id="addSub" class="btn">Add Subcategory</button> <button id="addProd" class="btn">Add Product</button></div>
+          <div style="margin-top:10px"><strong>Subcategories</strong><div id="subList" class="list"></div></div>
+          <div style="margin-top:10px"><strong>Products</strong><div id="prodList" class="list"></div></div>
+          <div style="margin-top:10px"><button id="closeEditor" class="ghost">Close</button></div>
+        `;
+        root.appendChild(editor);
+
+        document.getElementById('addSub').onclick = ()=>{ const s=document.getElementById('newSub').value.trim(); if(!s) return alert('Enter subcategory'); c.subcategories.push(s); saveData(data); renderLists(); document.getElementById('newSub').value=''; }
+        document.getElementById('addProd').onclick = ()=>{ const name=document.getElementById('newProd').value.trim(); const img=document.getElementById('newProdImg').value.trim(); if(!name) return alert('Enter product name'); const pid=Date.now(); c.products.push({id:pid,name, img: img||'https://source.unsplash.com/featured/?'+encodeURIComponent(name), description:'', sku:''}); saveData(data); renderLists(); document.getElementById('newProd').value=''; document.getElementById('newProdImg').value=''; }
+        document.getElementById('closeEditor').onclick = ()=>{ editor.remove(); }
+        function renderLists(){
+          const sl=document.getElementById('subList'); sl.innerHTML=''; c.subcategories.forEach((s,idx)=>{ const d=document.createElement('div'); d.className='item'; d.innerHTML=`<div>${s}</div><div class="flex"><button class="ghost" data-idx="${idx}" data-action="delsub">Delete</button></div>`; sl.appendChild(d); });
+          sl.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const i=Number(b.dataset.idx); c.subcategories.splice(i,1); saveData(data); renderLists(); });
+
+          const pl=document.getElementById('prodList'); pl.innerHTML=''; c.products.forEach((p,idx)=>{ const d=document.createElement('div'); d.className='item'; d.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><img src="${p.img}" style="height:48px;width:64px;object-fit:cover;border-radius:6px" alt=""><div><strong>${p.name}</strong><div class="small">${p.description||''}</div></div></div><div class="flex"><button class="ghost" data-idx="${idx}" data-action="editprod">Edit</button><button class="ghost" data-idx="${idx}" data-action="delprod">Delete</button></div>`; pl.appendChild(d);
+            });
+          pl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ const i=Number(b.dataset.idx); const a=b.dataset.action; if(a==='delprod'){ if(confirm('Delete product?')){ c.products.splice(i,1); saveData(data); renderLists(); } } if(a==='editprod'){ openEditProduct(c,i); } }));
+        }
+        renderLists();
+
+        function openEditProduct(category,i){ const p=category.products[i]; const m=document.createElement('div'); m.className='panel'; m.style.marginTop='12px'; m.innerHTML = `<h4>Edit Product</h4><label>Name</label><input id="ep_name" value="${p.name}" /><label>Image URL</label><input id="ep_img" value="${p.img||''}" /><label>Description</label><textarea id="ep_desc">${p.description||''}</textarea><div style="margin-top:8px"><button id="saveP" class="btn">Save</button> <button id="cancelP" class="ghost">Cancel</button></div>`; editor.appendChild(m);
+          document.getElementById('cancelP').onclick=()=>m.remove(); document.getElementById('saveP').onclick=()=>{ p.name=document.getElementById('ep_name').value; p.img=document.getElementById('ep_img').value; p.description=document.getElementById('ep_desc').value; saveData(data); alert('Saved'); m.remove(); renderLists(); }
+        }
+      }
+
+      // Render initial categories list
+      renderCats();
+    }
+
+    /***** Public Preview (reads the same data) *****/
+    function renderPreview(root){
+      const data = loadData();
+      root.innerHTML = '';
+      const out = document.createElement('div'); out.className='panel';
+      out.innerHTML = `<h2 style="margin-top:0">${data.site.name}</h2><p class="small">${data.site.address} · <a class="link" href="tel:${data.site.phone}">${data.site.phone}</a> · <a class="link" href="mailto:${data.site.email}">${data.site.email}</a></p>`;
+      root.appendChild(out);
+
+      const grid = document.createElement('div'); grid.className='grid'; grid.style.display='grid'; grid.style.gridTemplateColumns='repeat(auto-fit,minmax(300px,1fr))'; grid.style.gap='16px';
+      data.categories.forEach(c=>{
+        const card = document.createElement('div'); card.className='panel';
+        card.innerHTML = `<div style="position:relative;height:160px;overflow:hidden;border-radius:8px"><img src="${c.banner||'https://source.unsplash.com/featured/?'+encodeURIComponent(c.title)}" style="width:100%;height:100%;object-fit:cover;filter:brightness(0.6)" alt=""><div style="position:absolute;left:12px;bottom:12px;color:var(--white);font-weight:800;font-size:18px">${c.title}</div></div>`;
+        const body = document.createElement('div'); body.style.marginTop='10px';
+        // subcategories
+        const ul = document.createElement('ul'); ul.className='small'; ul.style.paddingLeft='18px'; c.subcategories.forEach(s=>{ const li=document.createElement('li'); li.textContent=s; ul.appendChild(li); }); body.appendChild(ul);
+        // products grid
+        const pg = document.createElement('div'); pg.style.display='grid'; pg.style.gridTemplateColumns='repeat(auto-fit,minmax(160px,1fr))'; pg.style.gap='10px'; pg.style.marginTop='10px';
+        c.products.forEach(p=>{
+          const pi = document.createElement('div'); pi.style.background='rgba(255,255,255,0.02)'; pi.style.padding='8px'; pi.style.borderRadius='10px'; pi.style.textAlign='center';
+          pi.innerHTML = `<img src="${p.img}" alt="" style="width:100%;height:110px;object-fit:contain;border-radius:6px;background:#0a0a0a;padding:6px"><div style="font-weight:700;margin-top:6px">${p.name}</div><a class="btn" href="mailto:${data.site.email}?subject=Enquiry%20About%20${encodeURIComponent(p.name)}" style="display:inline-block;margin-top:8px">Enquire Now</a>`;
+          pg.appendChild(pi);
+        });
+        body.appendChild(pg);
+        card.appendChild(body); grid.appendChild(card);
+      });
+      root.appendChild(grid);
+
+      // footer / admin link
+      const f = document.createElement('div'); f.className='panel'; f.style.marginTop='14px'; f.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div class="small">Address: ${data.site.address}</div><div><a href="#/admin" class="ghost">Admin</a> <button id="downloadPub" class="btn">Export Public JSON</button></div></div>`;
+      root.appendChild(f);
+      document.getElementById('downloadPub').onclick = ()=>{ const blob = new Blob([JSON.stringify(loadData(),null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='anjali_data.json'; a.click(); URL.revokeObjectURL(url); }
+    }
+
+    // initial route
+    window.addEventListener('hashchange', router);
+    router();
+  </script>
+</body>
+</html>
