@@ -77,32 +77,35 @@
     <a href="https://maps.app.goo.gl/nTp9nwozZe6qtEDv6" target="_blank">Google Maps</a>
   </footer>
 
-  <script>
-    // Route Handling
-    function loadRoute() {
-      const hash = window.location.hash;
-      const adminPage = document.getElementById('admin-page');
-      const customerPage = document.getElementById('customer-page');
-      const whatsappBtn = document.getElementById('whatsapp-btn');
+ <script>
+  // Route Handling
+  function loadRoute() {
+    const hash = window.location.hash;
+    const adminPage = document.getElementById('admin-page');
+    const customerPage = document.getElementById('customer-page');
+    const whatsappBtn = document.getElementById('whatsapp-btn');
 
-      if (hash === "#/admin") {
-        adminPage.style.display = "block";
-        customerPage.style.display = "none";
-        whatsappBtn.style.display = "none";
-      } else {
-        adminPage.style.display = "none";
-        customerPage.style.display = "block";
-        whatsappBtn.style.display = "block";
-      }
+    if (hash === "#/admin") {
+      adminPage.style.display = "block";
+      customerPage.style.display = "none";
+      whatsappBtn.style.display = "none";
+    } else {
+      adminPage.style.display = "none";
+      customerPage.style.display = "block";
+      whatsappBtn.style.display = "block";
     }
+  }
 
-    window.addEventListener('hashchange', loadRoute);
-    window.addEventListener('load', () => {
-      if (!window.location.hash || window.location.hash === "#") {
-        window.location.hash = "#/";
-      }
-      loadRoute();
-    });
-  </script>
+  // Always redirect to customer page by default
+  window.addEventListener('load', () => {
+    if (!window.location.hash || window.location.hash === "#") {
+      window.location.hash = "#/";
+    }
+    loadRoute();
+  });
+
+  window.addEventListener('hashchange', loadRoute);
+</script>
+
 </body>
 </html>
